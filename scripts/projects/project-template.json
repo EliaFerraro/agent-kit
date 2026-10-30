@@ -65,7 +65,7 @@
     {
       "name": "Ready for agents",
       "layout": "TABLE_LAYOUT",
-      "filter": "is:open label:agent:ready -label:agent:working",
+      "filter": "is:open label:agent:ready -label:agent:working -is:blocked",
       "fields": [
         "Title",
         "Priority",
@@ -73,7 +73,7 @@
         "Milestone",
         "Labels"
       ],
-      "manual": "Sort by Priority."
+      "manual": "Sort by Priority. Blocked issues are excluded: an agent never picks one up."
     },
     {
       "name": "Stalled",
