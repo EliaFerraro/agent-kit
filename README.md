@@ -27,3 +27,6 @@ My reusable agent harness: the system that lets Claude Code agents build my proj
 ```
 
 The kit stays optional: in any repo I can always work by hand or in chat.
+
+## Licence
+[MIT](LICENSE).
