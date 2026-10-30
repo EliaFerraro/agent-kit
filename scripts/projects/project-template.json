@@ -1,5 +1,5 @@
 {
-  "$comment": "One template for every repo's GitHub Project. See docs/project-boards.md and ADR 0007. Status is set by automation from labels, never by hand.",
+  "$comment": "One template for every repo's GitHub Project. See docs/project-boards.md and ADR 0007. Status is set by automation from labels, never by hand. Priority is the org number field 1-100 (100 = do first); there are no priority labels.",
   "status": [
     "Inbox",
     "Ready",
@@ -48,7 +48,7 @@
         "Linked pull requests",
         "Waited on me (h)"
       ],
-      "manual": "Sort by Priority, then Waited on me (h) descending."
+      "manual": "Sort by Priority descending (100 first), then Waited on me (h) descending."
     },
     {
       "name": "Flow",
@@ -73,7 +73,7 @@
         "Milestone",
         "Labels"
       ],
-      "manual": "Sort by Priority. Blocked issues are excluded: an agent never picks one up."
+      "manual": "Sort by Priority descending (100 first). Blocked issues are excluded: an agent never picks one up."
     },
     {
       "name": "Stalled",
@@ -98,7 +98,7 @@
         "Labels",
         "Sub-issues progress"
       ],
-      "manual": "Group by Milestone; sort by Priority."
+      "manual": "Group by Milestone; sort by Priority descending (100 first)."
     },
     {
       "name": "Shipped",
