@@ -1,6 +1,6 @@
 # Project boards — design
 
-> Status: **proposal**, for Elia to decide. Nothing here is built yet, except what jamly's [42-project-board](https://github.com/EliaFerraro/jamly/blob/dev/docs/process/42-project-board.md) already specifies.
+> Status: **accepted** — decisions in ADR 0006 and ADR 0007. Nothing here is built yet, except what jamly's [42-project-board](https://github.com/ferrarolabs/jamly/blob/dev/docs/process/42-project-board.md) already specifies.
 > When decided, the choices become ADRs. The template moves to `template/` only after it has run on jamly (ADR 0001).
 
 The board's job, in one line: **show Elia what needs him, and show him whether the agents are working well — at a glance, from a phone.**
@@ -131,6 +131,8 @@ Ranked by value for effort. Each one says where its data comes from, because tha
 
 ### 4.1 Usage per issue and per model (M3)
 
+**Model names.** The policy and every subagent's `model:` name the **full id** (`claude-haiku-5-5`, `claude-sonnet-5-5`, `claude-opus-5-5`), or the ledger checks what an alias resolved to. On 2026-10-30, CLI 2.1.190 resolved `haiku` → Haiku 4.5 and `sonnet` → Sonnet 4.6; after updating to 2.1.314 they resolved to 5.5.
+
 **The goal.** See whether the model policy is followed: **Haiku** for atomic, well-defined work with no interpretation; **Sonnet** for complex but defined work; **Opus** for coordination, reasoning, planning. Whether that policy is *right* is a separate question; this measures whether it is *followed*.
 
 **How.** A `SessionEnd` hook (❓ or `Stop`, made idempotent) reads the session transcript, including subagent transcripts, and sums tokens per model. It then upserts one **usage ledger** comment on the issue: one row per session, then totals per model. The issue number comes from `gitBranch`. Comments are on the issue, so agents, Actions and I can all read them, and they survive the session.
@@ -248,9 +250,9 @@ The org decision (§3.8) sits before P1, because it changes which token the Acti
 | T1 | A Claude cloud session can read and set **issue fields** in an org repo | Decides the org question | Free test org + throwaway repo + one cloud session |
 | T2 | Historical charts are available on Free | M4 and the charts | Create one in a test project |
 | T3 | A hook in a cloud session can comment on its issue | M3 in the cloud | One-line hook on a test issue |
-| T4 | Subagent usage is in the session's transcripts (the `subagents/` folder, or `isSidechain` lines) | M3 per role | Run a session that spawns one subagent, read the files |
-| T5 | Project filters support `updated:<@today-1d` | The Stalled view | Type it into a view |
-| T6 | GitHub Mobile shows the board layout, or only tables | Which views get the phone | Open the project in the app |
+| T4 | ✅ **Verified 2026-10-30.** Each subagent has its own transcript in `<session>/subagents/agent-*.jsonl` (with `isSidechain: true`, its own `model`) plus a `.meta.json` with the agent type. The headless result's `modelUsage` includes subagents. **Raw transcript lines double-count**: dedupe by request id | M3 per role | Done |
+| T5 | ✅ partly: the `updated:` qualifier with `@today-1d` exists (docs). ❓ Which way `>` / `<` point: the docs read `updated:>@today-1w` as "seven or more days ago" | The Stalled view | Type both into a real view |
+| T6 | ✅ docs: GitHub Mobile shows projects as **lists with collapsible groups**, not as boards | Phone views are tables grouped by Status | Done |
 
 ---
 
