@@ -251,7 +251,7 @@ The org decision (§3.8) sits before P1, because it changes which token the Acti
 | T2 | Historical charts are available on Free | M4 and the charts | Create one in a test project |
 | T3 | A hook in a cloud session can comment on its issue | M3 in the cloud | One-line hook on a test issue |
 | T4 | ✅ **Verified 2026-10-30.** Each subagent has its own transcript in `<session>/subagents/agent-*.jsonl` (with `isSidechain: true`, its own `model`) plus a `.meta.json` with the agent type. The headless result's `modelUsage` includes subagents. **Raw transcript lines double-count**: dedupe by request id | M3 per role | Done |
-| T5 | ✅ partly: the `updated:` qualifier with `@today-1d` exists (docs). ❓ Which way `>` / `<` point: the docs read `updated:>@today-1w` as "seven or more days ago" | The Stalled view | Type both into a real view |
+| T5 | ✅ **Verified 2026-10-30** on live items via `items(query:)`: `<` means older. `updated:<@today-1d` → 0 and `updated:>@today-1d` → all, on items all updated today. The Stalled filter is right | The Stalled view | Done |
 | T6 | ✅ docs: GitHub Mobile shows projects as **lists with collapsible groups**, not as boards | Phone views are tables grouped by Status | Done |
 
 ---

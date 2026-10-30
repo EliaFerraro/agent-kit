@@ -1,0 +1,63 @@
+{
+  "$comment": "One template for every repo's GitHub Project. See docs/project-boards.md and ADR 0007. Status is set by automation from labels, never by hand.",
+  "status": ["Inbox", "Ready", "In progress", "Needs me", "Device check", "Done"],
+  "numberFields": ["Cost $", "Opus share %", "Waited on me (h)"],
+  "issueFields": ["Priority", "Effort"],
+  "statusFromLabels": [
+    { "label": "needs:device-check", "status": "Device check" },
+    { "label": "needs:elia", "status": "Needs me" },
+    { "label": "agent:working", "status": "In progress" },
+    { "label": "agent:ready", "status": "Ready" }
+  ],
+  "views": [
+    {
+      "name": "Needs me",
+      "layout": "TABLE_LAYOUT",
+      "filter": "is:open label:needs:elia,needs:device-check",
+      "fields": ["Title", "Status", "Priority", "Labels", "Linked pull requests", "Waited on me (h)"],
+      "manual": "Sort by Priority, then Waited on me (h) descending."
+    },
+    {
+      "name": "Flow",
+      "layout": "BOARD_LAYOUT",
+      "filter": "-status:Done",
+      "fields": ["Title", "Priority", "Effort", "Labels"],
+      "manual": "Column field: Status."
+    },
+    {
+      "name": "Ready for agents",
+      "layout": "TABLE_LAYOUT",
+      "filter": "is:open label:agent:ready -label:agent:working",
+      "fields": ["Title", "Priority", "Effort", "Milestone", "Labels"],
+      "manual": "Sort by Priority."
+    },
+    {
+      "name": "Stalled",
+      "layout": "TABLE_LAYOUT",
+      "filter": "is:open label:agent:working updated:<@today-1d",
+      "fields": ["Title", "Labels", "Linked pull requests"],
+      "manual": "Sort by Updated, oldest first."
+    },
+    {
+      "name": "Milestone",
+      "layout": "TABLE_LAYOUT",
+      "filter": "-status:Done",
+      "fields": ["Title", "Status", "Priority", "Effort", "Labels", "Sub-issues progress"],
+      "manual": "Group by Milestone; sort by Priority."
+    },
+    {
+      "name": "Shipped",
+      "layout": "TABLE_LAYOUT",
+      "filter": "status:Done",
+      "fields": ["Title", "Effort", "Cost $", "Opus share %", "Waited on me (h)", "Linked pull requests"],
+      "manual": "Sort by Updated, newest first."
+    }
+  ],
+  "workflows": [
+    "Item added to project → Status: Inbox",
+    "Item closed → Status: Done",
+    "Pull request merged → Status: Done",
+    "Auto-add to project: this repo, filter is:issue,pr is:open",
+    "Auto-archive items: is:closed updated:<@today-14d"
+  ]
+}
