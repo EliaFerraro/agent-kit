@@ -13,7 +13,7 @@ Each phase is useful on its own and has a verifiable **exit criterion**. We don'
 - [x] Permissions in `.claude/settings.json`: deny secrets and irreversible commands ([jamly#1](https://github.com/EliaFerraro/jamly/pull/1))
 - [x] CI on GitHub Actions: test, lint, typecheck, on pushes to every long-lived branch ([jamly#1](https://github.com/EliaFerraro/jamly/pull/1))
 - [x] Issue templates: feature and bug ([jamly#1](https://github.com/EliaFerraro/jamly/pull/1))
-- [ ] Branch protection on `dev`, `staging`, `master`: PR + green CI required
+- [ ] Branch protection on `dev`, `staging`, `main`: PR + green CI required
 - [ ] Cloud environment configured: setup script, network allowlist, no Supabase credentials
 
 **Exit:** a real issue implemented by a cloud session started from my phone, with a PR and green CI, without me writing code.
