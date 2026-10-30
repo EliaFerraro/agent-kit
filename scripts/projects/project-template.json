@@ -1,63 +1,130 @@
 {
   "$comment": "One template for every repo's GitHub Project. See docs/project-boards.md and ADR 0007. Status is set by automation from labels, never by hand.",
-  "status": ["Inbox", "Ready", "In progress", "Needs me", "Device check", "Done"],
-  "numberFields": ["Cost $", "Opus share %", "Waited on me (h)"],
-  "issueFields": ["Priority", "Effort"],
+  "status": [
+    "Inbox",
+    "Ready",
+    "In progress",
+    "Needs me",
+    "Device check",
+    "Done"
+  ],
+  "numberFields": [
+    "Cost $",
+    "Opus share %",
+    "Waited on me (h)"
+  ],
+  "issueFields": [
+    "Priority",
+    "Effort"
+  ],
   "statusFromLabels": [
-    { "label": "needs:device-check", "status": "Device check" },
-    { "label": "needs:elia", "status": "Needs me" },
-    { "label": "agent:working", "status": "In progress" },
-    { "label": "agent:ready", "status": "Ready" }
+    {
+      "label": "needs:device-check",
+      "status": "Device check"
+    },
+    {
+      "label": "needs:elia",
+      "status": "Needs me"
+    },
+    {
+      "label": "agent:working",
+      "status": "In progress"
+    },
+    {
+      "label": "agent:ready",
+      "status": "Ready"
+    }
   ],
   "views": [
     {
       "name": "Needs me",
       "layout": "TABLE_LAYOUT",
       "filter": "is:open label:needs:elia,needs:device-check",
-      "fields": ["Title", "Status", "Priority", "Labels", "Linked pull requests", "Waited on me (h)"],
+      "fields": [
+        "Title",
+        "Status",
+        "Priority",
+        "Labels",
+        "Linked pull requests",
+        "Waited on me (h)"
+      ],
       "manual": "Sort by Priority, then Waited on me (h) descending."
     },
     {
       "name": "Flow",
       "layout": "BOARD_LAYOUT",
       "filter": "-status:Done",
-      "fields": ["Title", "Priority", "Effort", "Labels"],
+      "fields": [
+        "Title",
+        "Priority",
+        "Effort",
+        "Labels"
+      ],
       "manual": "Column field: Status."
     },
     {
       "name": "Ready for agents",
       "layout": "TABLE_LAYOUT",
       "filter": "is:open label:agent:ready -label:agent:working",
-      "fields": ["Title", "Priority", "Effort", "Milestone", "Labels"],
+      "fields": [
+        "Title",
+        "Priority",
+        "Effort",
+        "Milestone",
+        "Labels"
+      ],
       "manual": "Sort by Priority."
     },
     {
       "name": "Stalled",
       "layout": "TABLE_LAYOUT",
       "filter": "is:open label:agent:working updated:<@today-1d",
-      "fields": ["Title", "Labels", "Linked pull requests"],
+      "fields": [
+        "Title",
+        "Labels",
+        "Linked pull requests"
+      ],
       "manual": "Sort by Updated, oldest first."
     },
     {
       "name": "Milestone",
       "layout": "TABLE_LAYOUT",
       "filter": "-status:Done",
-      "fields": ["Title", "Status", "Priority", "Effort", "Labels", "Sub-issues progress"],
+      "fields": [
+        "Title",
+        "Status",
+        "Priority",
+        "Effort",
+        "Labels",
+        "Sub-issues progress"
+      ],
       "manual": "Group by Milestone; sort by Priority."
     },
     {
       "name": "Shipped",
       "layout": "TABLE_LAYOUT",
       "filter": "status:Done",
-      "fields": ["Title", "Effort", "Cost $", "Opus share %", "Waited on me (h)", "Linked pull requests"],
+      "fields": [
+        "Title",
+        "Effort",
+        "Cost $",
+        "Opus share %",
+        "Waited on me (h)",
+        "Linked pull requests"
+      ],
       "manual": "Sort by Updated, newest first."
     }
   ],
   "workflows": [
-    "Item added to project → Status: Inbox",
-    "Item closed → Status: Done",
-    "Pull request merged → Status: Done",
-    "Auto-add to project: this repo, filter is:issue,pr is:open",
-    "Auto-archive items: is:closed updated:<@today-14d"
+    "Run after the script: it replaces the Status options, so any workflow set earlier loses its value (shown with a red !) and must be re-picked.",
+    "Item added to project → Set Status: Inbox (on)",
+    "Item closed → Set Status: Done (on)",
+    "Pull request merged → Set Status: Done (on)",
+    "Auto-add to project: this repo, filter is:issue,pr is:open (on)",
+    "Auto-archive items: is:closed updated:<@today-14d (on)",
+    "Auto-add sub-issues to project (on)",
+    "Auto-close issue (off: closing drives Status, never the other way)",
+    "Pull request linked to issue (off: labels drive In progress)",
+    "Code changes requested / Code review approved (off)"
   ]
 }
