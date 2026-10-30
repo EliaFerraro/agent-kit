@@ -1,20 +1,21 @@
 # agent-kit
 
-Questo repo è il **kit**, non un progetto applicativo. Contiene il piano e, man mano, i file che vengono copiati nei progetti.
+This repo is the **kit**, not an application. It holds the plan and, over time, the files that get copied into projects.
 
-## Dove sta cosa
-- `docs/PLAN.md` è la fonte di verità sull'obiettivo. Se una modifica lo contraddice, fermati e chiedi.
-- `docs/ROADMAP.md` dice cosa fare ora. Lavora solo sulla fase in corso; non anticipare le successive.
-- `template/` contiene **solo** file generici, validi per qualunque progetto. Niente riferimenti a jamly o ad altri progetti specifici.
+## Where things are
+- `docs/PLAN.md` is the source of truth for the goal. If a change contradicts it, stop and ask.
+- `docs/ROADMAP.md` says what to do now. Work only on the current phase; don't get ahead of it.
+- `template/` holds **only** generic files that work for any project. No references to jamly or any other specific project.
 
-## Regole
-- Ogni scelta non ovvia diventa una ADR in `docs/decisions/`, numerata in sequenza, con contesto, decisione e conseguenze.
-- Non aggiungere a `template/` un componente che non è stato provato su un progetto reale (vedi ADR 0001).
-- Ogni hook o controllo aggiunto va accompagnato dalla prova che sa fallire.
-- Scrivi in italiano, frasi brevi.
+## Rules
+- **Everything in this repo is in English**: files, decisions, issues, PRs, commit messages.
+- Every non-obvious choice becomes an ADR in `docs/decisions/`, numbered in sequence, with context, decision and consequences.
+- Nothing goes into `template/` until it has been proven on a real project (see ADR 0001).
+- Every hook or check added comes with proof that it can fail.
+- Short sentences.
 
 ## Definition of done
-- La checklist della fase in `docs/ROADMAP.md` è aggiornata.
-- Le decisioni prese sono registrate come ADR.
-- `docs/PLAN.md` è ancora coerente con quello che c'è nel repo.
-- Merge su `main` solo dopo la mia approvazione.
+- The current phase's checklist in `docs/ROADMAP.md` is updated.
+- Decisions taken are recorded as ADRs.
+- `docs/PLAN.md` still matches what's in the repo.
+- Merged to `main` only after my approval.

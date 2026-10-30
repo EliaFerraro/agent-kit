@@ -1,62 +1,62 @@
 # Roadmap
 
-Ogni fase è utile da sola e ha un **criterio di uscita** verificabile. Non si passa alla successiva finché il criterio non è soddisfatto. Il pilota è **jamly**: le fasi 1–3 si costruiscono lì, la fase 4 estrae ciò che è generico in questo repo.
+Each phase is useful on its own and has a verifiable **exit criterion**. We don't move to the next phase until it's met. The pilot is **jamly**: phases 1–3 are built there, phase 4 extracts what's generic into this repo.
 
-## Fase 0 · Piano ✅
-- [x] Visione, principi e architettura in [PLAN.md](PLAN.md)
-- [x] Prime decisioni in [decisions/](decisions/)
+## Phase 0 · Plan ✅
+- [x] Goal, principles and architecture in [PLAN.md](PLAN.md)
+- [x] First decisions in [decisions/](decisions/)
 
-**Uscita:** il piano è scritto e approvato da me.
+**Exit:** the plan is written and approved by me.
 
-## Fase 1 · Fondamenta (su jamly)
-- [ ] `CLAUDE.md` di jamly scritto come contract corto, con definition of done
-- [ ] Permessi in `.claude/settings.json`: deny su segreti e comandi distruttivi
-- [ ] CI su GitHub Actions: test, lint, typecheck
-- [ ] Branch protection su `main`: solo PR con CI verde
-- [ ] Template issue: feature e bug
-- [ ] Ambiente cloud configurato: setup script, rete limitata
+## Phase 1 · Foundations (on jamly) — in progress
+- [x] jamly's `CLAUDE.md` written as a short contract, with the definition of done and who holds each line ([jamly#1](https://github.com/EliaFerraro/jamly/pull/1))
+- [x] Permissions in `.claude/settings.json`: deny secrets and irreversible commands ([jamly#1](https://github.com/EliaFerraro/jamly/pull/1))
+- [x] CI on GitHub Actions: test, lint, typecheck, on pushes to every long-lived branch ([jamly#1](https://github.com/EliaFerraro/jamly/pull/1))
+- [x] Issue templates: feature and bug ([jamly#1](https://github.com/EliaFerraro/jamly/pull/1))
+- [ ] Branch protection on `dev`, `staging`, `master`: PR + green CI required
+- [ ] Cloud environment configured: setup script, network allowlist, no Supabase credentials
 
-**Uscita:** un'issue reale implementata da una sessione cloud avviata dal telefono, con PR e CI verde, senza che io scriva codice.
+**Exit:** a real issue implemented by a cloud session started from my phone, with a PR and green CI, without me writing code.
 
-## Fase 2 · Sensori
-- [ ] Skill `verify-done`: esegue ogni criterio della definition of done e riporta una riga per criterio
-- [ ] Stop hook che impedisce di finire con test, lint o typecheck rossi, e rimanda l'errore reale
-- [ ] PostToolUse hook: format e lint sui file modificati
-- [ ] Subagent `critic`
-- [ ] Ogni hook fatto fallire apposta una volta
+## Phase 2 · Sensors
+- [ ] `verify-done` skill: runs every machine-checkable line of the definition of done and reports one row per line
+- [ ] Stop hook that refuses to finish with red tests, lint or typecheck, and sends back the real error
+- [ ] PostToolUse hook: format and lint on changed files
+- [ ] `critic` subagent
+- [ ] Every hook made to fail on purpose once
 
-**Uscita:** ho visto un agente provare a finire con un test rosso, venire bloccato e correggersi da solo.
+**Exit:** I've watched an agent try to finish with a red test, get blocked, and fix it on its own.
 
-## Fase 3 · Autonomia lunga
-- [ ] Convenzione `docs/progress.md`
-- [ ] Skill `riprendi-lavoro`, idempotente
-- [ ] Scheduled task di ripresa nel cloud
-- [ ] Segnalazione "ho bisogno di te" quando l'agente è bloccato
-- [ ] Command log (colonna Record)
+## Phase 3 · Long autonomy
+- [ ] `docs/progress.md` convention
+- [ ] Idempotent `resume-work` skill
+- [ ] Cloud scheduled task that resumes work
+- [ ] "I need you" signal when the agent is blocked
+- [ ] Command log (Record column)
 
-**Uscita:** una feature avanza per 24 ore senza mia interazione, attraversando almeno un limite d'uso.
+**Exit:** a feature moves forward for 24 hours without me, across at least one usage limit.
 
-## Fase 4 · Estrazione nel kit
-- [ ] Separare in jamly i file generici da quelli specifici
-- [ ] Popolare `template/` in questo repo
-- [ ] `scripts/bootstrap.sh` e `scripts/sync-kit.sh`
-- [ ] Skill di livello account: `scrivi-spec`, `critico`, `spiega-feature`
-- [ ] Questo repo impostato come template repository
+## Phase 4 · Extraction into the kit
+- [ ] Split jamly's generic files from its project-specific ones
+- [ ] Fill `template/` in this repo
+- [ ] `scripts/bootstrap.sh` and `scripts/sync-kit.sh`
+- [ ] Account-level skills: `write-spec`, `critic`, `explain-feature`
+- [ ] This repo set up as a GitHub template repository
 
-**Uscita:** un secondo progetto attivato con il kit in meno di 30 minuti, e un aggiornamento del kit propagato a jamly con lo script.
+**Exit:** a second project set up with the kit in under 30 minutes, and a kit update propagated to jamly with the script.
 
-## Fase 5 · Qualità continua
-- [ ] Subagent `explainer` e cartella `docs/learn/`
-- [ ] Codebase auditor settimanale, un tema per volta, max 5 issue
-- [ ] Eval-set dell'harness: 10 task in `evals/` tratti da errori reali
-- [ ] Ogni errore ricorrente di un agente diventa regola, hook o task di eval
+## Phase 5 · Continuous quality
+- [ ] `explainer` subagent and `docs/learn/`
+- [ ] Weekly codebase auditor, one theme at a time, at most 5 issues
+- [ ] Harness eval set: 10 tasks in `evals/` drawn from real failures
+- [ ] Every recurring agent mistake becomes a rule, a hook or an eval task
 
-**Uscita:** un mese di issue dell'auditor smistate, e l'eval-set che gira a ogni modifica del kit.
+**Exit:** a month of auditor issues triaged, and the eval set running on every change to the kit.
 
-## Fase 6 · Parallelismo
-- [ ] 2–3 sessioni in parallelo su aree diverse del codice
-- [ ] Auto-fix delle PR
-- [ ] Agent teams per review e dibattito su decisioni difficili
-- [ ] (Opzionale) visualizzazione dello stato degli agenti
+## Phase 6 · Parallelism
+- [ ] 2–3 sessions in parallel on different areas of the code
+- [ ] PR auto-fix
+- [ ] Agent teams for review and debate on hard decisions
+- [ ] (Optional) a view of what the agents are doing
 
-**Uscita:** una settimana con più feature avanzate in parallelo, senza conflitti tra branch.
+**Exit:** a week with several features moving in parallel, with no conflicts between branches.

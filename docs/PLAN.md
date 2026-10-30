@@ -1,158 +1,159 @@
-# Piano — agent-kit
+# Plan — agent-kit
 
-> Documento vivo. Descrive **dove vogliamo arrivare**. Cosa fare e in che ordine sta in [ROADMAP.md](ROADMAP.md), il perché delle scelte in [decisions/](decisions/).
+> Living document. It describes **where we want to end up**. What to do and in which order lives in [ROADMAP.md](ROADMAP.md); why each choice was made lives in [decisions/](decisions/).
 
-## 1. Obiettivo
+## 1. Goal
 
-Un sistema agentico riutilizzabile che mi permette di sviluppare i miei progetti con agenti Claude Code che lavorano **da soli e a lungo** (anche 12–24 ore senza che io guardi), mentre io mi occupo solo di:
+A reusable agentic system that lets me build my projects with Claude Code agents that work **on their own, for long stretches** (12–24 hours without me looking), while I only own:
 
-- **decisioni di prodotto**: cosa costruire e perché;
-- **decisioni architetturali**: come è fatto il sistema e quali compromessi accettiamo;
-- **approvazione**: merge delle PR, guardando test e comportamento, non ogni riga.
+- **product decisions**: what to build and why;
+- **architectural decisions**: how the system is shaped and which trade-offs we accept;
+- **approval**: merging PRs by looking at tests and behaviour, not at every line.
 
-Io "possiedo" la feature, non ogni linea di codice. Per capire come funziona ciò che gli agenti scrivono, ogni feature produce una spiegazione didattica (`docs/learn/`).
+I own the feature, not every line of code. To understand what the agents write, every feature produces a learning note (`docs/learn/`).
 
-Il sistema è **opt-in**: in qualunque repo posso continuare a lavorare a mano o in chat. Gli agenti lavorano solo quando glielo chiedo o quando ho acceso un'automazione per quel repo.
+The system is **opt-in**: in any repo I can keep working by hand or in chat. Agents work only when I ask them to, or when I've switched on an automation for that repo.
 
-### Come capisco che funziona
+### How I know it works
 
-1. Scrivo un'issue, chiudo il telefono, e il giorno dopo trovo una PR con CI verde che rispetta la definition of done.
-2. Se finisco i limiti d'uso a metà, il lavoro riparte da solo al reset, dal punto in cui si era fermato.
-3. Un progetto nuovo si attiva con il kit in meno di 30 minuti.
-4. Quando un agente sbaglia, la correzione diventa una regola, un hook o un test nel kit, e non si ripete in nessun progetto.
+1. I write an issue, put my phone away, and the next day there's a PR with green CI that meets the definition of done.
+2. If I run out of usage halfway through, the work resumes on its own after the reset, from where it stopped.
+3. A new project is set up with the kit in under 30 minutes.
+4. When an agent gets something wrong, the fix becomes a rule, a hook or a test in the kit, and the mistake doesn't repeat in any project.
 
-## 2. Principi
+## 2. Principles
 
-Presi dal metodo *Harness Engineering* (Alexio Cassani, Codemotion 2026) e adattati.
+Taken from the *Harness Engineering* method (Alexio Cassani, Codemotion 2026) and adapted.
 
-1. **Agent = Modello + Harness.** Il modello non lo controllo; tutto il resto sì. Il lavoro è sull'harness.
-2. **Lo stato vive nel repo, non nella sessione.** Spec, piano, avanzamento e decisioni sono file committati. Una sessione può morire in qualunque momento senza perdere nulla.
-3. **Irreversibile → boundary, non istruzione.** Una frase in `CLAUDE.md` alza solo una probabilità. Ciò che non si può annullare si impedisce con permessi, sandbox, branch protection.
-4. **La definition of done è presidiata, non solo dichiarata.** Il contract la dichiara, una skill la esegue, uno Stop hook impedisce di finire finché non passa.
-5. **Evidenze, non verdetti.** Quando un controllo fallisce, all'agente torna l'output reale dell'errore.
-6. **Ogni controllo va visto fallire.** Un check mai visto rosso potrebbe non essere collegato.
-7. **Gli agenti propongono, io decido.** Nessun agente fa merge su `main` o cambia l'architettura da solo.
-8. **Contract corto.** `CLAUDE.md` contiene solo ciò che il codice non può dire: trappole, motivazioni, comandi giusti, definition of done.
-9. **Costruire dal basso.** Prima si usa su un progetto reale (jamly), poi si estrae ciò che è generico.
+1. **Agent = Model + Harness.** I don't control the model; I control everything else. The work is on the harness.
+2. **State lives in the repo, not in the session.** Spec, plan, progress and decisions are committed files. A session can die at any moment without losing anything.
+3. **Irreversible → boundary, not instruction.** A sentence in `CLAUDE.md` only raises a probability. What can't be undone is prevented by permissions, sandboxing and branch protection.
+4. **The definition of done is enforced, not just stated.** The contract states it, a skill runs it, a Stop hook refuses to finish until it passes.
+5. **Evidence, not verdicts.** When a check fails, the agent gets the real error output back.
+6. **Every check must be seen failing.** A check never seen red may not be wired up at all.
+7. **Agents propose, I decide.** No agent merges to a protected branch or changes the architecture on its own.
+8. **Short contract.** `CLAUDE.md` holds only what the code can't say: pitfalls, reasons, the right commands, the definition of done.
+9. **Build bottom-up.** Use it on a real project first (jamly), then extract what's generic.
+10. **Everything in a repo is in English.** Code, docs, decisions, issues, PRs and commit messages. The apps themselves can be in any language.
 
-## 3. Architettura: tre livelli
+## 3. Architecture: three levels
 
-Vincolo tecnico che decide tutto: **una sessione cloud vede solo ciò che è committato nel repo e le skill attive sul mio account claude.ai.** La configurazione del mio PC (`~/.claude/`) non arriva nel cloud, e i plugin dichiarati nel repo nel cloud non vengono installati.
+The technical constraint that shapes everything: **a cloud session sees only what is committed to the repo, plus the skills enabled on my claude.ai account.** My machine's configuration (`~/.claude/`) doesn't reach the cloud, and plugins declared in the repo aren't installed in cloud sessions.
 
-| Livello | Dove vive | Cosa contiene | Vale per |
+| Level | Where it lives | What it holds | Applies to |
 |---|---|---|---|
-| **Account** | Skill sul mio account claude.ai | Il *metodo*: scrivere spec, implementare un'issue, criticare, spiegare, riprendere il lavoro | Ogni sessione cloud, su ogni repo |
-| **Kit** | Questo repo, copiato nei progetti | Ruoli (subagent), hook, permessi, regole, template issue, CI di base, scheletro di `CLAUDE.md` | Ogni progetto che lo adotta |
-| **Progetto** | Il repo del progetto | `CLAUDE.md` specifico, decisioni architetturali, `progress.md`, `docs/learn/` | Solo quel progetto |
+| **Account** | Skills on my claude.ai account | The *method*: writing specs, implementing an issue, critiquing, explaining, resuming work | Every cloud session, on every repo |
+| **Kit** | This repo, copied into projects | Roles (subagents), hooks, permissions, rules, issue templates, baseline CI, a `CLAUDE.md` skeleton | Every project that adopts it |
+| **Project** | The project's repo | Project-specific `CLAUDE.md`, architectural decisions, `progress.md`, `docs/learn/` | That project only |
 
-Il kit si distribuisce come una libreria: **questo repo è l'originale**, ogni progetto ne ha una **copia** (serve perché la sessione cloud clona solo il repo su cui lavora). Uno script di sync aggiorna i file generici senza toccare quelli specifici del progetto. Niente git submodule.
+The kit is distributed like a library: **this repo is the original**, each project holds a **copy** (needed because a cloud session clones only the repo it works on). A sync script updates the generic files without touching the project-specific ones. No git submodules.
 
-### Struttura finale di questo repo
+### Final layout of this repo
 
 ```
 agent-kit/
-├── CLAUDE.md                 # come lavorare su questo repo
+├── CLAUDE.md                 # how to work on this repo
 ├── docs/
-│   ├── PLAN.md               # questo file
-│   ├── ROADMAP.md            # fasi e checklist
-│   └── decisions/            # ADR del kit
-├── template/                 # ciò che viene copiato in ogni progetto
+│   ├── PLAN.md               # this file
+│   ├── ROADMAP.md            # phases and checklists
+│   └── decisions/            # the kit's ADRs
+├── template/                 # what gets copied into every project
 │   ├── CLAUDE.md.template
 │   ├── .claude/
-│   │   ├── settings.json     # permessi + hook
-│   │   ├── agents/           # ruoli
-│   │   ├── skills/           # skill specifiche di sviluppo
-│   │   ├── rules/            # stile, testing, sicurezza (path-scoped)
-│   │   └── hooks/            # script degli hook
+│   │   ├── settings.json     # permissions + hooks
+│   │   ├── agents/           # roles
+│   │   ├── skills/           # development skills
+│   │   ├── rules/            # style, testing, security (path-scoped)
+│   │   └── hooks/            # hook scripts
 │   ├── .github/
 │   │   ├── ISSUE_TEMPLATE/   # feature, bug
 │   │   └── workflows/ci.yml  # test, lint, typecheck
 │   └── docs/
-│       ├── decisions/        # dove il progetto registra le sue ADR
-│       ├── learn/            # spiegazioni didattiche
-│       └── progress.md       # stato del lavoro in corso
-├── account-skills/           # sorgenti delle skill da attivare sull'account
-├── evals/                    # test dell'harness stesso
+│       ├── decisions/        # where the project records its ADRs
+│       ├── learn/            # learning notes
+│       └── progress.md       # state of the work in progress
+├── account-skills/           # sources of the skills to enable on the account
+├── evals/                    # tests for the harness itself
 └── scripts/
-    ├── bootstrap.sh          # attiva il kit in un repo
-    └── sync-kit.sh           # aggiorna il kit in un repo
+    ├── bootstrap.sh          # set up the kit in a repo
+    └── sync-kit.sh           # update the kit in a repo
 ```
 
-## 4. Ruoli degli agenti
+## 4. Agent roles
 
-| Ruolo | Quando lavora | Cosa produce | Cosa non può fare |
+| Role | When it works | What it produces | What it can't do |
 |---|---|---|---|
-| **Spec writer** | Su mia richiesta | Issue esplicita da una mia idea: contesto, criteri di accettazione, fuori ambito, casi di test | Decidere il prodotto al posto mio |
-| **Planner** | All'inizio di ogni issue | Piano in `docs/plans/<issue>.md`, decisioni architetturali da approvare | Scrivere codice |
-| **Implementer** | Dopo il piano approvato | Codice + test su un branch, commit piccoli, `progress.md` aggiornato | Fare merge, toccare segreti o deploy |
-| **Critic** | Prima della PR | Obiezioni concrete al lavoro dell'implementer, su contesto pulito | Modificare il codice |
-| **Test writer** | Insieme all'implementer | Test ancorati ai criteri di accettazione, non al codice scritto | Indebolire test esistenti |
-| **Explainer** | A feature chiusa | `docs/learn/<feature>.md`: struttura, concetti del framework, alternative scartate, punti del codice da guardare | — |
-| **Codebase auditor** | Settimanale, un tema per volta | Max 3–5 issue `audit` con prove e proposta, senza duplicare issue già aperte o rifiutate | Correggere direttamente |
+| **Spec writer** | When I ask | An explicit issue from my idea: context, acceptance criteria, out of scope, test cases | Make product decisions for me |
+| **Planner** | At the start of every issue | A plan in `docs/plans/<issue>.md`, with the architectural decisions I need to approve | Write code |
+| **Implementer** | After the plan is approved | Code + tests on a branch, small commits, `progress.md` kept current | Merge, touch secrets or deployments |
+| **Critic** | Before the PR | Concrete objections to the implementer's work, on a clean context | Change the code |
+| **Test writer** | Alongside the implementer | Tests anchored to the acceptance criteria, not to the code written | Weaken existing tests |
+| **Explainer** | When a feature is closed | `docs/learn/<feature>.md`: structure, framework concepts, alternatives rejected, where to look in the code | — |
+| **Codebase auditor** | Weekly, one theme at a time | At most 3–5 `audit` issues with evidence and a proposal, never duplicating issues already open or rejected | Fix things directly |
 
-## 5. Il flusso di una feature
+## 5. The flow of a feature
 
 ```
-idea → [spec writer] → issue → [planner] → piano ──(io approvo)──▶
-[implementer + test writer] ⇄ hook/CI ⇄ [critic] → PR verde ──(io faccio merge)──▶
+idea → [spec writer] → issue → [planner] → plan ──(I approve)──▶
+[implementer + test writer] ⇄ hooks/CI ⇄ [critic] → green PR ──(I merge)──▶
 [explainer] → docs/learn
 ```
 
-I punti in cui intervengo sono due: **approvo il piano** e **faccio il merge**. Tutto il resto gira da solo.
+I step in at two points: **I approve the plan** and **I merge**. Everything else runs on its own.
 
-## 6. Autonomia lunga e ripresa dopo i limiti
+## 6. Long autonomy and resuming after limits
 
-Obiettivo: la feature avanza per 12–24 ore senza di me, anche attraverso un limite d'uso.
+Goal: the feature moves forward for 12–24 hours without me, including across a usage limit.
 
-- **Stato su file:** `docs/progress.md` dice quale issue è in corso, cosa è fatto, cosa manca, il prossimo passo e gli eventuali blocchi. Si aggiorna a ogni passo concluso, con un commit.
-- **Commit piccoli e frequenti:** il lavoro salvato è quello pushato sul branch.
-- **Ripresa automatica:** uno scheduled task nel cloud parte a intervalli regolari con l'istruzione "riprendi dal `progress.md`". Se ho finito i limiti, le esecuzioni vengono rifiutate fino al reset; la prima dopo il reset riparte dal punto salvato.
-- **Idempotenza:** riprendere due volte non deve fare danni. Se il lavoro è già finito o bloccato in attesa di me, la ripresa non fa nulla.
-- **Richiesta di aiuto:** se l'agente è bloccato su una decisione mia, lo scrive in `progress.md`, si ferma e me lo segnala (issue o commento sulla PR).
+- **State in a file:** `docs/progress.md` says which issue is in progress, what's done, what's left, the next step and any blockers. It's updated after every completed step, with a commit.
+- **Small, frequent commits:** saved work is work pushed to the branch.
+- **Automatic resume:** a cloud scheduled task runs at regular intervals with the instruction "resume from `progress.md`". When I'm out of usage, runs are rejected until the reset; the first one after the reset picks up from the saved point.
+- **Idempotence:** resuming twice must do no harm. If the work is already done, or blocked waiting for me, the resume does nothing.
+- **Asking for help:** if the agent is blocked on a decision of mine, it writes it in `progress.md`, stops, and flags it to me (an issue or a PR comment).
 
-## 7. Boundary
+## 7. Boundaries
 
-| Anello | Cosa impedisce |
+| Ring | What it prevents |
 |---|---|
-| **Permessi** (`.claude/settings.json` del repo) | Leggere `.env` e segreti, comandi distruttivi (`rm -rf`, `git push --force`), modificare config di deploy e CI senza chiedere |
-| **Ambiente cloud** | Rete limitata ai domini necessari; chiavi come network secrets, che l'agente usa senza vedere |
-| **GitHub** | `main` protetto: si entra solo da PR con CI verde e approvata da me |
-| **Hook** | Stop gate sulla definition of done; pre-action gate sui comandi pericolosi |
+| **Permissions** (the repo's `.claude/settings.json`) | Reading `.env` and secrets, destructive commands (`rm -rf`, `git push --force`), changing deploy and CI config without asking |
+| **Cloud environment** | Network limited to the domains needed; keys stored as network secrets, which the agent uses without seeing; no production credentials |
+| **GitHub** | Protected branches: changes land only through a PR with green CI and my approval |
+| **Hooks** | A Stop gate on the definition of done; a pre-action gate on dangerous commands |
 
-La branch protection è la rete di sicurezza vera: non dipende dal comportamento dell'agente.
+Branch protection is the real safety net: it doesn't depend on how the agent behaves. Deny rules are a guardrail: they match the command text an agent usually writes, not every way of running a program.
 
-## 8. Matrice harness: stato obiettivo
+## 8. Harness matrix: target state
 
-Cinque componenti per quattro ruoli. Questa è la griglia che il kit deve riempire alla fine; lo stato attuale si verifica a ogni fase.
+Five components by four roles. This is the grid the kit must fill by the end; the current state is checked at every phase.
 
 | | Guide | Sensor | Boundary | Record |
 |---|---|---|---|---|
-| **Contesto** | `CLAUDE.md` corto, definition of done | "esegui la verifica prima di dichiarare finito" | Path e segreti esclusi dal contesto | Transcript delle sessioni |
-| **Tool** | Skill con descrizioni precise | Errori dei tool che spiegano come riprovare | Allow/deny per tool | Log delle tool call |
-| **Infrastruttura** | Setup script dell'ambiente cloud | Test, lint, typecheck eseguibili | Rete limitata, nessuna credenziale di produzione | Branch e commit come snapshot |
-| **Orchestrazione** | Definizioni dei ruoli | Critic e auditor su contesto pulito | Tool limitati per ruolo | `progress.md` e piani come handoff |
-| **Hook** | SessionStart che inietta lo stato corrente | PostToolUse: format e lint | PreToolUse: gate sui comandi pericolosi | Command log con chiave di sessione |
+| **Context** | Short `CLAUDE.md`, definition of done | "run the checks before saying done" | Paths and secrets kept out of context | Session transcripts |
+| **Tools** | Skills with precise descriptions | Tool errors that explain how to retry | Allow/deny per tool | Tool-call log |
+| **Infrastructure** | Cloud environment setup script | Runnable tests, lint, typecheck | Limited network, no production credentials | Branches and commits as snapshots |
+| **Orchestration** | Role definitions | Critic and auditor on a clean context | Tools scoped per role | `progress.md` and plans as handoff |
+| **Hooks** | SessionStart injecting the current state | PostToolUse: format and lint | PreToolUse: gate on dangerous commands | Command log keyed by session |
 
-## 9. Costi e limiti
+## 9. Cost and limits
 
-Le sessioni cloud consumano lo stesso budget del piano (finestra di 5 ore + tetto settimanale), in proporzione a quante ne girano insieme. Per questo:
+Cloud sessions draw on the same plan budget (5-hour window + weekly cap), in proportion to how many run at once. So:
 
-- parallelismo realistico: **2–3 sessioni**, non dieci;
-- agent teams solo per review e dibattito, non per l'implementazione di routine;
-- auditor settimanale, non giornaliero;
-- ogni automazione ha un intervallo pensato, non "il più spesso possibile".
+- realistic parallelism: **2–3 sessions**, not ten;
+- agent teams only for review and debate, not routine implementation;
+- weekly auditor, not daily;
+- every automation has a deliberate interval, not "as often as possible".
 
-## 10. Fuori ambito (per ora)
+## 10. Out of scope (for now)
 
-- Interfaccia grafica stile "omini isometrici": prima il sistema, poi eventualmente la visualizzazione. Per sapere chi ha bisogno di me bastano la lista sessioni di claude.ai/code e le notifiche dell'app.
-- Deploy automatico in produzione da parte degli agenti.
-- Uso del PC o della rete aziendale: il kit vive solo su account e macchine personali.
+- A graphical "isometric agents" view: the system first, the visualisation maybe later. The session list on claude.ai/code and the app's notifications are enough to see who needs me.
+- Agents deploying to production.
+- Using the company laptop or network: the kit lives only on personal accounts and machines.
 
-## 11. Domande aperte
+## 11. Open questions
 
-Da decidere man mano, ognuna diventerà una ADR:
+To be settled along the way; each becomes an ADR:
 
-- Stack di test di riferimento per i progetti frontend (Vitest + Playwright?).
-- Ogni quanto parte lo scheduled task di ripresa (ogni 1 o 2 ore?).
-- Come mi arriva la segnalazione "ho bisogno di te" (issue, commento PR, notifica app).
-- Quali skill vanno a livello account e quali restano nel kit.
+- Reference test stack for frontend projects (Vitest + Playwright? jamly uses Jest + jest-expo).
+- How often the resume scheduled task runs (every 1 or 2 hours?).
+- How "I need you" reaches me (issue, PR comment, app notification).
+- Which skills live at account level and which stay in the kit.

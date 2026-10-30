@@ -1,29 +1,29 @@
 # agent-kit
 
-Il mio harness agentico riutilizzabile: il sistema che permette ad agenti Claude Code di sviluppare i miei progetti in autonomia, mentre io prendo le decisioni di prodotto e architetturali e approvo il risultato.
+My reusable agent harness: the system that lets Claude Code agents build my projects on their own, while I make the product and architectural decisions and approve the result.
 
-**Stato:** Fase 0, piano. Il kit si costruisce un pezzo per volta, usandolo prima sul progetto pilota **jamly**.
+**Status:** Phase 1, foundations. The kit is built one piece at a time, first on the pilot project **jamly**.
 
-## Da dove partire
+## Where to start
 
-- [docs/PLAN.md](docs/PLAN.md): dove vogliamo arrivare. Obiettivo, principi, architettura, ruoli degli agenti, flusso, boundary.
-- [docs/ROADMAP.md](docs/ROADMAP.md): le fasi, ognuna con il suo criterio di uscita.
-- [docs/decisions/](docs/decisions/): il perché delle scelte, una decisione per file.
+- [docs/PLAN.md](docs/PLAN.md): where we want to end up. Goal, principles, architecture, agent roles, flow, boundaries.
+- [docs/ROADMAP.md](docs/ROADMAP.md): the phases, each with its exit criterion.
+- [docs/decisions/](docs/decisions/): why each choice was made, one decision per file.
 
-## L'idea in tre righe
+## The idea in three lines
 
-- **Agent = Modello + Harness.** Il modello non lo controllo; contesto, tool, boundary, hook e orchestrazione sì.
-- **Lo stato vive nel repo.** Spec, piani e avanzamento sono file, così il lavoro sopravvive alla fine di una sessione e riprende da solo dopo un limite d'uso.
-- **Gli agenti propongono, io decido.** Approvo i piani e faccio il merge; tutto il resto è presidiato da test, hook e branch protection.
+- **Agent = Model + Harness.** I don't control the model; context, tools, boundaries, hooks and orchestration I do.
+- **State lives in the repo.** Specs, plans and progress are files, so work survives the end of a session and resumes on its own after a usage limit.
+- **Agents propose, I decide.** I approve plans and merge; everything else is held by tests, hooks and branch protection.
 
-## Come si userà (dalla Fase 4)
+## How it will be used (from Phase 4)
 
 ```bash
-# attivare il kit in un repo
-./scripts/bootstrap.sh ../mio-progetto
+# set up the kit in a repo
+./scripts/bootstrap.sh ../my-project
 
-# aggiornare il kit in un repo che lo usa già
-./scripts/sync-kit.sh ../mio-progetto
+# update the kit in a repo that already uses it
+./scripts/sync-kit.sh ../my-project
 ```
 
-Il kit resta opzionale: in ogni repo posso sempre lavorare a mano o in chat.
+The kit stays optional: in any repo I can always work by hand or in chat.
