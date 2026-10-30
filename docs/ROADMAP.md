@@ -9,13 +9,15 @@ Each phase is useful on its own and has a verifiable **exit criterion**. We don'
 **Exit:** the plan is written and approved by me.
 
 ## Phase 1 · Foundations (on jamly) — in progress
-- [x] jamly's `CLAUDE.md` written as a short contract, with the definition of done and who holds each line ([jamly#1](https://github.com/EliaFerraro/jamly/pull/1))
-- [x] Permissions in `.claude/settings.json`: deny secrets and irreversible commands ([jamly#1](https://github.com/EliaFerraro/jamly/pull/1))
-- [x] CI on GitHub Actions: test, lint, typecheck, on pushes to every long-lived branch ([jamly#1](https://github.com/EliaFerraro/jamly/pull/1))
-- [x] Issue templates: feature and bug ([jamly#1](https://github.com/EliaFerraro/jamly/pull/1))
-- [x] Labels as code and a project board spec: labels carry the agent workflow, the Project is for planning ([jamly#1](https://github.com/EliaFerraro/jamly/pull/1))
-- [ ] GitHub Project created from the spec (by hand: Projects aren't reachable from a session)
-- [ ] Branch protection on `dev`, `staging`, `main`: PR + green CI required ([jamly#2](https://github.com/EliaFerraro/jamly/issues/2))
+- [x] jamly's `CLAUDE.md` written as a short contract, with the definition of done and who holds each line ([jamly#1](https://github.com/ferrarolabs/jamly/pull/1))
+- [x] Permissions in `.claude/settings.json`: deny secrets and irreversible commands ([jamly#1](https://github.com/ferrarolabs/jamly/pull/1))
+- [x] CI on GitHub Actions: test, lint, typecheck, on pushes to every long-lived branch ([jamly#1](https://github.com/ferrarolabs/jamly/pull/1))
+- [x] Issue templates: feature and bug ([jamly#1](https://github.com/ferrarolabs/jamly/pull/1))
+- [x] Labels as code and a project board spec: labels carry the agent workflow, the Project is for planning ([jamly#1](https://github.com/ferrarolabs/jamly/pull/1))
+- [ ] GitHub Projects built from the [board design](project-boards.md) (ADR 0007)
+- [x] Branch protection on `dev`, `staging`, `main`: PR + green CI required. Proven: a direct push is rejected, a red PR is blocked, a green one merges ([jamly#2](https://github.com/ferrarolabs/jamly/issues/2))
+- [x] Push deny rules probed: 12 ways to push to a protected branch denied, feature branches allowed ([jamly#5](https://github.com/ferrarolabs/jamly/pull/5))
+- [x] Repos public (rulesets need it on Free), under the `ferrarolabs` organization (ADR 0005, ADR 0006)
 - [ ] Cloud environment configured: setup script, network allowlist, no Supabase credentials
 
 **Exit:** a real issue implemented by a cloud session started from my phone, with a PR and green CI, without me writing code.
