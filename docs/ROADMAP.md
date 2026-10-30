@@ -13,6 +13,8 @@ Each phase is useful on its own and has a verifiable **exit criterion**. We don'
 - [x] Permissions in `.claude/settings.json`: deny secrets and irreversible commands ([jamly#1](https://github.com/EliaFerraro/jamly/pull/1))
 - [x] CI on GitHub Actions: test, lint, typecheck, on pushes to every long-lived branch ([jamly#1](https://github.com/EliaFerraro/jamly/pull/1))
 - [x] Issue templates: feature and bug ([jamly#1](https://github.com/EliaFerraro/jamly/pull/1))
+- [x] Labels as code and a project board spec: labels carry the agent workflow, the Project is for planning ([jamly#1](https://github.com/EliaFerraro/jamly/pull/1))
+- [ ] GitHub Project created from the spec (by hand: Projects aren't reachable from a session)
 - [ ] Branch protection on `dev`, `staging`, `main`: PR + green CI required ([jamly#2](https://github.com/EliaFerraro/jamly/issues/2))
 - [ ] Cloud environment configured: setup script, network allowlist, no Supabase credentials
 
@@ -38,7 +40,7 @@ Each phase is useful on its own and has a verifiable **exit criterion**. We don'
 
 ## Phase 4 · Extraction into the kit
 - [ ] Split jamly's generic files from its project-specific ones
-- [ ] Fill `template/` in this repo
+- [ ] Fill `template/` in this repo, including the generic labels (type, agent state, priority) and the board spec
 - [ ] `scripts/bootstrap.sh` and `scripts/sync-kit.sh`
 - [ ] Account-level skills: `write-spec`, `critic`, `explain-feature`
 - [ ] This repo set up as a GitHub template repository
