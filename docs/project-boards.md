@@ -253,7 +253,7 @@ The org decision (§3.8) sits before P1, because it changes which token the Acti
 | T4 | ✅ **Verified 2026-10-30.** Each subagent has its own transcript in `<session>/subagents/agent-*.jsonl` (with `isSidechain: true`, its own `model`) plus a `.meta.json` with the agent type. The headless result's `modelUsage` includes subagents. **Raw transcript lines double-count**: dedupe by request id | M3 per role | Done |
 | T5 | ✅ **Verified 2026-10-30** on live items via `items(query:)`: `<` means older. `updated:<@today-1d` → 0 and `updated:>@today-1d` → all, on items all updated today. The Stalled filter is right | The Stalled view | Done |
 | T6 | ✅ docs: GitHub Mobile shows projects as **lists with collapsible groups**, not as boards | Phone views are tables grouped by Status | Done |
-| T7 | An issue-field change triggers a GitHub Action | Whether Stage can start an agent, as `issues: labeled` does today | [Test: does an issue-field change trigger a GitHub Action?](https://github.com/ferrarolabs/agent-kit/issues/81) |
+| T7 | ✅ **Documented 2026-10-31** (GitHub docs source, `events-that-trigger-workflows.md`): `issues` has `field_added` (set or changed) and `field_removed`. Live proof comes with the [auto-start](https://github.com/ferrarolabs/agent-kit/issues/76) | Whether Stage can start an agent, as `issues: labeled` does today | Done |
 
 ### T1 · what was run (2026-10-31, cloud session)
 
@@ -286,7 +286,7 @@ The org decision (§3.8) sits before P1, because it changes which token the Acti
 - Org paths, such as `orgs/ferrarolabs/projectsV2`: `sessions are bound to their configured repositories`. So `gh project list` fails too (`unknown owner type`).
 - `gh auth status` reports `The token in GH_TOKEN is invalid` while `gh api user` works. Don't trust it; test with `gh api user`.
 
-Not covered: whether a field change triggers an Action (T7: `docs.github.com` is outside the session's network allowlist).
+**What does reach the Project:** a cloud session can start a workflow (`POST repos/{owner}/{repo}/actions/workflows/{file}/dispatches` passes the proxy) and read its runs. So project scripts run in an Action, started from the cloud ([Project scripts run in an Action, started from cloud sessions](https://github.com/ferrarolabs/agent-kit/issues/83)).
 
 ---
 
