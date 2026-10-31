@@ -3,6 +3,10 @@
 //
 //   node build-project.js --owner ferrarolabs --repo jamly --title Jamly [--extra extra-views.json]
 //   node build-project.js --owner ferrarolabs --repo jamly --title Jamly --check
+//   node build-project.js --owner ferrarolabs --template --title "Agent work"
+//
+// --template builds the org's project template: no repo, no items, marked as a
+// template so it shows under the org's Templates and in "New project".
 //
 // Build is idempotent: it creates what is missing and leaves the rest.
 // Check changes nothing: it diffs the live project against the template and
@@ -20,7 +24,8 @@ const args = Object.fromEntries(
     return acc;
   }, []),
 );
-for (const k of ['owner', 'repo', 'title']) if (!args[k]) throw new Error(`missing --${k}`);
+const asTemplate = args.template === true;
+for (const k of asTemplate ? ['owner', 'title'] : ['owner', 'repo', 'title']) if (!args[k]) throw new Error(`missing --${k}`);
 const checkOnly = args.check === true;
 
 const template = JSON.parse(fs.readFileSync(path.join(__dirname, 'project-template.json'), 'utf8'));
@@ -51,32 +56,36 @@ const result = (ok, msg) => {
 
 // ---- owner, repo, project
 const { organization } = gql(
-  `query($o:String!,$r:String!,$t:String!){ organization(login:$o){ id
-     projectsV2(first:20, query:$t){ nodes{ id title number url } }
-     repository(name:$r){ id } } }`,
-  { o: args.owner, r: args.repo, t: args.title },
+  `query($o:String!,$r:String!,$t:String!,$withRepo:Boolean!){ organization(login:$o){ id
+     projectsV2(first:20, query:$t){ nodes{ id title number url template } }
+     repository(name:$r) @include(if:$withRepo){ id } } }`,
+  { o: args.owner, r: args.repo || '', t: args.title, withRepo: !asTemplate },
 );
 let project = organization.projectsV2.nodes.find((p) => p.title === args.title);
 if (!project) {
   if (checkOnly) throw new Error(`project "${args.title}" not found`);
   project = gql(
-    `mutation($o:ID!,$t:String!,$r:ID!){ createProjectV2(input:{ownerId:$o,title:$t,repositoryId:$r}){ projectV2{ id title number url } } }`,
-    { o: organization.id, t: args.title, r: organization.repository.id },
+    `mutation($o:ID!,$t:String!){ createProjectV2(input:{ownerId:$o,title:$t}){ projectV2{ id title number url template } } }`,
+    { o: organization.id, t: args.title },
   ).createProjectV2.projectV2;
   log(`created project ${project.url}`);
 } else log(`project ${project.url}`);
 const P = project.id;
 
 if (!checkOnly) {
-  gql(`mutation($p:ID!,$r:ID!){ linkProjectV2ToRepository(input:{projectId:$p,repositoryId:$r}){ clientMutationId } }`, {
-    p: P,
-    r: organization.repository.id,
-  });
+  if (!asTemplate)
+    gql(`mutation($p:ID!,$r:ID!){ linkProjectV2ToRepository(input:{projectId:$p,repositoryId:$r}){ clientMutationId } }`, {
+      p: P,
+      r: organization.repository.id,
+    });
   gql(`mutation($p:ID!,$d:String!){ updateProjectV2(input:{projectId:$p,shortDescription:$d}){ clientMutationId } }`, {
     p: P,
-    d: `Agent work on ${args.owner}/${args.repo}. Status is set from labels, never by hand.`,
+    d: asTemplate
+      ? 'Template for every repo: agent work, Status set from labels, never by hand. Built from agent-kit/scripts/projects.'
+      : `Agent work on ${args.owner}/${args.repo}. Status is set from labels, never by hand.`,
   });
 }
+if (asTemplate && checkOnly) result(project.template, 'marked as an org template');
 
 // ---- fields
 const FIELDS_Q = `query($p:ID!){ node(id:$p){ ... on ProjectV2{ fields(first:50){ nodes{
@@ -159,9 +168,11 @@ for (const [i, v] of views.entries()) {
 
 // ---- items: open issues and PRs, plus those closed in the last 30 days
 const since = new Date(Date.now() - 30 * 864e5).toISOString();
-const issues = rest(`repos/${args.owner}/${args.repo}/issues?state=all&since=${since}&per_page=100`).filter(
-  (i) => i.state === 'open' || new Date(i.closed_at) > new Date(since),
-);
+const issues = asTemplate
+  ? []
+  : rest(`repos/${args.owner}/${args.repo}/issues?state=all&since=${since}&per_page=100`).filter(
+      (i) => i.state === 'open' || new Date(i.closed_at) > new Date(since),
+    );
 const statusFor = (i) => {
   if (i.state === 'closed') return 'Done';
   const labels = i.labels.map((l) => l.name);
@@ -191,6 +202,10 @@ for (const v of views) {
   log(`     view "${v.name}": ${n} item(s) for "${v.filter}"`);
 }
 
+if (asTemplate && !checkOnly && !project.template) {
+  gql(`mutation($p:ID!){ markProjectV2AsTemplate(input:{projectId:$p}){ clientMutationId } }`, { p: P });
+  log('marked as an org template');
+}
 if (!checkOnly) {
   log('\nManual steps (the API cannot set these):');
   for (const v of views) if (v.manual) log(`  - ${v.name}: ${v.manual}`);
