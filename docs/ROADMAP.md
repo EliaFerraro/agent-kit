@@ -20,7 +20,7 @@ Each phase is useful on its own and has a verifiable **exit criterion**. We don'
 - [ ] Action that sets Status from labels (ADR 0007)
 - [ ] Issue data in org issue fields; Stage mirrored with Status by a [10-minute reconciler](https://github.com/ferrarolabs/agent-kit/issues/78) (ADR 0009, proposed). Cloud sessions [can read and set them](https://github.com/ferrarolabs/agent-kit/issues/24); Stage will [replace the agent labels](https://github.com/ferrarolabs/agent-kit/issues/82)
 - [x] Claude GitHub App on the `ferrarolabs` org, all repos: a cloud session pushed a branch and opened a PR (2026-10-31)
-- [ ] [`gh` working in cloud sessions](https://github.com/ferrarolabs/agent-kit/issues/70) with an org token
+- [x] [`gh` working in cloud sessions](https://github.com/ferrarolabs/agent-kit/issues/70) with an org token: REST only; GraphQL and org paths are blocked, so project scripts go through [an Action](https://github.com/ferrarolabs/agent-kit/issues/83)
 - [x] Branch protection on `dev`, `staging`, `main`: PR + green CI required. Proven: a direct push is rejected, a red PR is blocked, a green one merges ([jamly#2](https://github.com/ferrarolabs/jamly/issues/2))
 - [x] Push deny rules probed: 12 ways to push to a protected branch denied, feature branches allowed ([jamly#5](https://github.com/ferrarolabs/jamly/pull/5))
 - [x] Repos public (rulesets need it on Free), under the `ferrarolabs` organization (ADR 0005, ADR 0006)
