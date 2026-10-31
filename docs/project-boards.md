@@ -247,12 +247,28 @@ The org decision (§3.8) sits before P1, because it changes which token the Acti
 
 | # | Hypothesis | Why it matters | Cheapest test |
 |---|---|---|---|
-| T1 | A Claude cloud session can read and set **issue fields** in an org repo | Decides the org question | Free test org + throwaway repo + one cloud session |
+| T1 | ✅ **Verified 2026-10-31 via the GitHub MCP tools**, on a throwaway issue in `ferrarolabs/agent-kit` (see below). `gh api` not tested: `gh` has no valid token yet ([Cloud sessions: a working `gh`](https://github.com/ferrarolabs/agent-kit/issues/70)) | Decides whether issue fields can carry the agents' state | Done |
 | T2 | Historical charts are available on Free | M4 and the charts | Create one in a test project |
 | T3 | A hook in a cloud session can comment on its issue | M3 in the cloud | One-line hook on a test issue |
 | T4 | ✅ **Verified 2026-10-30.** Each subagent has its own transcript in `<session>/subagents/agent-*.jsonl` (with `isSidechain: true`, its own `model`) plus a `.meta.json` with the agent type. The headless result's `modelUsage` includes subagents. **Raw transcript lines double-count**: dedupe by request id | M3 per role | Done |
 | T5 | ✅ **Verified 2026-10-30** on live items via `items(query:)`: `<` means older. `updated:<@today-1d` → 0 and `updated:>@today-1d` → all, on items all updated today. The Stalled filter is right | The Stalled view | Done |
 | T6 | ✅ docs: GitHub Mobile shows projects as **lists with collapsible groups**, not as boards | Phone views are tables grouped by Status | Done |
+| T7 | An issue-field change triggers a GitHub Action | Whether Stage can start an agent, as `issues: labeled` does today | [Test: does an issue-field change trigger a GitHub Action?](https://github.com/ferrarolabs/agent-kit/issues/81) |
+
+### T1 · what was run (2026-10-31, cloud session, MCP tools)
+
+| Step | Call | Result |
+|---|---|---|
+| List fields, repo level | `list_issue_fields(owner=ferrarolabs, repo=agent-kit)` | Start date, Target date, Effort (High/Medium/Low), Priority (number) |
+| List fields, org level | `list_issue_fields(owner=ferrarolabs)` | `Resource not accessible by integration`. This is why the first try returned nothing: the app can't read org-level settings. Always pass `repo` |
+| Read | `issue_read(get)` on [Test: can a cloud session read and set issue fields?](https://github.com/ferrarolabs/agent-kit/issues/24) | `field_values: [{Priority: "73"}]` |
+| Set on create | `issue_write(create, issue_fields=[Effort=Low, Priority=5])` → [Throwaway: issue-field test](https://github.com/ferrarolabs/agent-kit/issues/80) | Read back: `Priority "5"`, `Effort "Low"` |
+| Update and clear | `issue_write(update, issue_fields=[Effort=High, Priority delete])` | Read back: `Effort "High"`, Priority gone |
+| Search | `search_issues(..., fields=[field_values])` | Returns field values per issue |
+| Fails on a bad option | `Effort = "Huge"` | `issue field option "Huge" was not found for field "Effort"`; value unchanged |
+| Fails on a missing field | `Stage = "Ready"` | `issue field "Stage" was not found in ferrarolabs/agent-kit` (Stage doesn't exist yet) |
+
+Not covered: `gh api` (blocked by [a working `gh`](https://github.com/ferrarolabs/agent-kit/issues/70)), and whether a field change triggers an Action (T7: `docs.github.com` is outside the session's network allowlist).
 
 ---
 

@@ -18,7 +18,7 @@ Each phase is useful on its own and has a verifiable **exit criterion**. We don'
 - [ ] Template finalised by hand (sorts, grouping, workflows), then the repo projects created as copies of it (ADR 0008)
 - [ ] Board views: group-by, sort and workflows set by hand (the API can't)
 - [ ] Action that sets Status from labels (ADR 0007)
-- [ ] Issue data in org issue fields; Stage mirrored with Status by a [10-minute reconciler](https://github.com/ferrarolabs/agent-kit/issues/78) (ADR 0009, proposed)
+- [ ] Issue data in org issue fields; Stage mirrored with Status by a [10-minute reconciler](https://github.com/ferrarolabs/agent-kit/issues/78) (ADR 0009, proposed). Cloud sessions [can read and set them](https://github.com/ferrarolabs/agent-kit/issues/24); Stage will [replace the agent labels](https://github.com/ferrarolabs/agent-kit/issues/82)
 - [x] Claude GitHub App on the `ferrarolabs` org, all repos: a cloud session pushed a branch and opened a PR (2026-10-31)
 - [ ] [`gh` working in cloud sessions](https://github.com/ferrarolabs/agent-kit/issues/70) with an org token
 - [x] Branch protection on `dev`, `staging`, `main`: PR + green CI required. Proven: a direct push is rejected, a red PR is blocked, a green one merges ([jamly#2](https://github.com/ferrarolabs/jamly/issues/2))
