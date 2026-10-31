@@ -22,8 +22,9 @@ Issue fields live on the issue. Agents, Actions and every project see the same v
 ## Consequences
 - Supersedes the part of [ADR 0007](0007-project-boards.md) that put number fields in the project.
 - `project-template.json` moves the number fields to `issueFields` and adds Stage.
-- [The cloud test of issue fields](https://github.com/ferrarolabs/agent-kit/issues/24) passed through the MCP tools. Agents must pass `repo` to `list_issue_fields`: the org-level call is denied to the app.
-- `gh api` is still untested. It waits on [a working `gh`](https://github.com/ferrarolabs/agent-kit/issues/70).
+- [The cloud test of issue fields](https://github.com/ferrarolabs/agent-kit/issues/24) passed through the MCP tools and through `gh api` (REST). Agents must pass `repo` to `list_issue_fields`: the org-level call is denied to the app.
+- Through REST, agents set fields with POST. PUT wipes every field it doesn't name.
+- Cloud sessions have no GraphQL and no org paths. Anything about the Project itself (Status) runs in an Action or on Elia's machine, never in a cloud session.
 - GitHub Actions schedules can run late under load. "Every 10 minutes" means "within about 10 to 20 minutes".
 - The reconciler needs the update time of both values. If one side doesn't expose it, the rule is revisited.
 - Every rule and doc that names an agent label changes ([Replace the agent labels with Stage in jamly's rules and docs](https://github.com/ferrarolabs/agent-kit/issues/82)). Until Stage exists, the labels stay.

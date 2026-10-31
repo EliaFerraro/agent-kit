@@ -247,7 +247,7 @@ The org decision (§3.8) sits before P1, because it changes which token the Acti
 
 | # | Hypothesis | Why it matters | Cheapest test |
 |---|---|---|---|
-| T1 | ✅ **Verified 2026-10-31 via the GitHub MCP tools**, on a throwaway issue in `ferrarolabs/agent-kit` (see below). `gh api` not tested: `gh` has no valid token yet ([Cloud sessions: a working `gh`](https://github.com/ferrarolabs/agent-kit/issues/70)) | Decides whether issue fields can carry the agents' state | Done |
+| T1 | ✅ **Verified 2026-10-31**, through the GitHub MCP tools and through `gh api` (REST), on a throwaway issue in `ferrarolabs/agent-kit` (see below). GraphQL is not available from cloud sessions | Decides whether issue fields can carry the agents' state | Done |
 | T2 | Historical charts are available on Free | M4 and the charts | Create one in a test project |
 | T3 | A hook in a cloud session can comment on its issue | M3 in the cloud | One-line hook on a test issue |
 | T4 | ✅ **Verified 2026-10-30.** Each subagent has its own transcript in `<session>/subagents/agent-*.jsonl` (with `isSidechain: true`, its own `model`) plus a `.meta.json` with the agent type. The headless result's `modelUsage` includes subagents. **Raw transcript lines double-count**: dedupe by request id | M3 per role | Done |
@@ -255,7 +255,9 @@ The org decision (§3.8) sits before P1, because it changes which token the Acti
 | T6 | ✅ docs: GitHub Mobile shows projects as **lists with collapsible groups**, not as boards | Phone views are tables grouped by Status | Done |
 | T7 | An issue-field change triggers a GitHub Action | Whether Stage can start an agent, as `issues: labeled` does today | [Test: does an issue-field change trigger a GitHub Action?](https://github.com/ferrarolabs/agent-kit/issues/81) |
 
-### T1 · what was run (2026-10-31, cloud session, MCP tools)
+### T1 · what was run (2026-10-31, cloud session)
+
+**MCP tools**
 
 | Step | Call | Result |
 |---|---|---|
@@ -268,7 +270,23 @@ The org decision (§3.8) sits before P1, because it changes which token the Acti
 | Fails on a bad option | `Effort = "Huge"` | `issue field option "Huge" was not found for field "Effort"`; value unchanged |
 | Fails on a missing field | `Stage = "Ready"` | `issue field "Stage" was not found in ferrarolabs/agent-kit` (Stage doesn't exist yet) |
 
-Not covered: `gh api` (blocked by [a working `gh`](https://github.com/ferrarolabs/agent-kit/issues/70)), and whether a field change triggers an Action (T7: `docs.github.com` is outside the session's network allowlist).
+**`gh api` (REST).** `R=repos/ferrarolabs/agent-kit/issues/80/issue-field-values`. Field ids come from `list_issue_fields`.
+
+| Step | Command | Result |
+|---|---|---|
+| Read | `gh api $R` | `[{issue_field_name: "Effort", single_select_option: {name: "High"}}]`. The issue itself also carries `issue_field_values` |
+| Add or update | `gh api -X POST $R` with `{"issue_field_values":[{"field_id":49251868,"value":"2026-11-15"}]}` | Target date set; Effort kept |
+| Replace all | `gh api -X PUT $R` with `{"issue_field_values":[{"field_id":49253581,"value":42}]}` | Priority 42, **and Effort and Target date gone**. PUT wipes every field it doesn't name. Agents use POST |
+| Clear one | `gh api -X DELETE $R/49253581` | Read back: `[]` |
+| Fails on a bad option | POST Effort with `999` | HTTP 422, `must be a string option name` |
+| Fails on a bad value | POST field id `1` with `"x"` | HTTP 422, `Issue field option with name x does not exist` |
+
+**What cloud sessions can't reach**, whatever the token:
+- GraphQL: `GitHub GraphQL is not available from Claude Code sessions; use the REST API`.
+- Org paths, such as `orgs/ferrarolabs/projectsV2`: `sessions are bound to their configured repositories`. So `gh project list` fails too (`unknown owner type`).
+- `gh auth status` reports `The token in GH_TOKEN is invalid` while `gh api user` works. Don't trust it; test with `gh api user`.
+
+Not covered: whether a field change triggers an Action (T7: `docs.github.com` is outside the session's network allowlist).
 
 ---
 
