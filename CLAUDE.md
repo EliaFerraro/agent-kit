@@ -13,6 +13,9 @@ This repo is the **kit**, not an application. It holds the plan and, over time, 
 - Nothing goes into `template/` until it has been proven on a real project (see ADR 0001).
 - Every hook or check added comes with proof that it can fail.
 - Short sentences.
+- Refer to issues, PRs, ADRs and projects by their name, as a clickable link. Never by a bare number.
+- An issue that needs my approval is atomic: one question or one task, readable in under a minute. Bigger work becomes a parent issue with sub-issues.
+- Nothing deferred lives only in chat: it becomes an issue.
 
 ## Definition of done
 - The current phase's checklist in `docs/ROADMAP.md` is updated.
