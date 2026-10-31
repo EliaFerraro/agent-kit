@@ -16,12 +16,16 @@ Issue fields live on the issue. Agents, Actions and every project see the same v
 - **The project's only own field is Status.**
 - **Stage mirrors Status**: the same values, in the same order, with the same colours.
 - **A reconciler runs every 10 minutes.** When Stage and Status differ, the value changed most recently wins. On a tie, Stage wins, because agents can see it ([decided](https://github.com/ferrarolabs/agent-kit/issues/71)).
+- **Stage replaces the agent labels** (`agent:ready`, `agent:working`, `needs:*`). One source for the agent's state ([decided](https://github.com/ferrarolabs/agent-kit/issues/72)). Cloud sessions can read and set issue fields ([tested](https://github.com/ferrarolabs/agent-kit/issues/24)).
 - **Nothing is left without data.** A [nightly check](https://github.com/ferrarolabs/agent-kit/issues/75) lists open issues with a missing field and puts them in front of Elia.
 
 ## Consequences
 - Supersedes the part of [ADR 0007](0007-project-boards.md) that put number fields in the project.
 - `project-template.json` moves the number fields to `issueFields` and adds Stage.
-- Depends on [the cloud test of issue fields](https://github.com/ferrarolabs/agent-kit/issues/24). If cloud sessions can't use them, this ADR is revisited.
+- [The cloud test of issue fields](https://github.com/ferrarolabs/agent-kit/issues/24) passed through the MCP tools and through `gh api` (REST). Agents must pass `repo` to `list_issue_fields`: the org-level call is denied to the app.
+- Through REST, agents set fields with POST. PUT wipes every field it doesn't name.
+- Cloud sessions have no GraphQL and no org paths. Anything about the Project itself (Status) runs in an Action, which a cloud session can start with `workflow_dispatch`.
 - GitHub Actions schedules can run late under load. "Every 10 minutes" means "within about 10 to 20 minutes".
 - The reconciler needs the update time of both values. If one side doesn't expose it, the rule is revisited.
-- Still open: [whether agent labels still drive Stage](https://github.com/ferrarolabs/agent-kit/issues/72), or Stage replaces them.
+- Every rule and doc that names an agent label changes ([Replace the agent labels with Stage in jamly's rules and docs](https://github.com/ferrarolabs/agent-kit/issues/82)). Until Stage exists, the labels stay.
+- A field change triggers Actions like a label does: `issues: field_added` and `field_removed` ([checked](https://github.com/ferrarolabs/agent-kit/issues/81)). The auto-start can listen to Stage.

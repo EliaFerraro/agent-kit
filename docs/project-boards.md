@@ -247,12 +247,46 @@ The org decision (§3.8) sits before P1, because it changes which token the Acti
 
 | # | Hypothesis | Why it matters | Cheapest test |
 |---|---|---|---|
-| T1 | A Claude cloud session can read and set **issue fields** in an org repo | Decides the org question | Free test org + throwaway repo + one cloud session |
+| T1 | ✅ **Verified 2026-10-31**, through the GitHub MCP tools and through `gh api` (REST), on a throwaway issue in `ferrarolabs/agent-kit` (see below). GraphQL is not available from cloud sessions | Decides whether issue fields can carry the agents' state | Done |
 | T2 | Historical charts are available on Free | M4 and the charts | Create one in a test project |
 | T3 | A hook in a cloud session can comment on its issue | M3 in the cloud | One-line hook on a test issue |
 | T4 | ✅ **Verified 2026-10-30.** Each subagent has its own transcript in `<session>/subagents/agent-*.jsonl` (with `isSidechain: true`, its own `model`) plus a `.meta.json` with the agent type. The headless result's `modelUsage` includes subagents. **Raw transcript lines double-count**: dedupe by request id | M3 per role | Done |
 | T5 | ✅ **Verified 2026-10-30** on live items via `items(query:)`: `<` means older. `updated:<@today-1d` → 0 and `updated:>@today-1d` → all, on items all updated today. The Stalled filter is right | The Stalled view | Done |
 | T6 | ✅ docs: GitHub Mobile shows projects as **lists with collapsible groups**, not as boards | Phone views are tables grouped by Status | Done |
+| T7 | ✅ **Documented 2026-10-31** (GitHub docs source, `events-that-trigger-workflows.md`): `issues` has `field_added` (set or changed) and `field_removed`. Live proof comes with the [auto-start](https://github.com/ferrarolabs/agent-kit/issues/76) | Whether Stage can start an agent, as `issues: labeled` does today | Done |
+
+### T1 · what was run (2026-10-31, cloud session)
+
+**MCP tools**
+
+| Step | Call | Result |
+|---|---|---|
+| List fields, repo level | `list_issue_fields(owner=ferrarolabs, repo=agent-kit)` | Start date, Target date, Effort (High/Medium/Low), Priority (number) |
+| List fields, org level | `list_issue_fields(owner=ferrarolabs)` | `Resource not accessible by integration`. This is why the first try returned nothing: the app can't read org-level settings. Always pass `repo` |
+| Read | `issue_read(get)` on [Test: can a cloud session read and set issue fields?](https://github.com/ferrarolabs/agent-kit/issues/24) | `field_values: [{Priority: "73"}]` |
+| Set on create | `issue_write(create, issue_fields=[Effort=Low, Priority=5])` → [Throwaway: issue-field test](https://github.com/ferrarolabs/agent-kit/issues/80) | Read back: `Priority "5"`, `Effort "Low"` |
+| Update and clear | `issue_write(update, issue_fields=[Effort=High, Priority delete])` | Read back: `Effort "High"`, Priority gone |
+| Search | `search_issues(..., fields=[field_values])` | Returns field values per issue |
+| Fails on a bad option | `Effort = "Huge"` | `issue field option "Huge" was not found for field "Effort"`; value unchanged |
+| Fails on a missing field | `Stage = "Ready"` | `issue field "Stage" was not found in ferrarolabs/agent-kit` (Stage doesn't exist yet) |
+
+**`gh api` (REST).** `R=repos/ferrarolabs/agent-kit/issues/80/issue-field-values`. Field ids come from `list_issue_fields`.
+
+| Step | Command | Result |
+|---|---|---|
+| Read | `gh api $R` | `[{issue_field_name: "Effort", single_select_option: {name: "High"}}]`. The issue itself also carries `issue_field_values` |
+| Add or update | `gh api -X POST $R` with `{"issue_field_values":[{"field_id":49251868,"value":"2026-11-15"}]}` | Target date set; Effort kept |
+| Replace all | `gh api -X PUT $R` with `{"issue_field_values":[{"field_id":49253581,"value":42}]}` | Priority 42, **and Effort and Target date gone**. PUT wipes every field it doesn't name. Agents use POST |
+| Clear one | `gh api -X DELETE $R/49253581` | Read back: `[]` |
+| Fails on a bad option | POST Effort with `999` | HTTP 422, `must be a string option name` |
+| Fails on a bad value | POST field id `1` with `"x"` | HTTP 422, `Issue field option with name x does not exist` |
+
+**What cloud sessions can't reach**, whatever the token:
+- GraphQL: `GitHub GraphQL is not available from Claude Code sessions; use the REST API`.
+- Org paths, such as `orgs/ferrarolabs/projectsV2`: `sessions are bound to their configured repositories`. So `gh project list` fails too (`unknown owner type`).
+- `gh auth status` reports `The token in GH_TOKEN is invalid` while `gh api user` works. Don't trust it; test with `gh api user`.
+
+**What does reach the Project:** a cloud session can start a workflow (`POST repos/{owner}/{repo}/actions/workflows/{file}/dispatches` passes the proxy) and read its runs. So project scripts run in an Action, started from the cloud ([Project scripts run in an Action, started from cloud sessions](https://github.com/ferrarolabs/agent-kit/issues/83)).
 
 ---
 

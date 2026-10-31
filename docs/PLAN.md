@@ -38,11 +38,12 @@ Taken from the *Harness Engineering* method (Alexio Cassani, Codemotion 2026) an
 
 ## 3. Architecture: three levels
 
-The technical constraint that shapes everything: **a cloud session sees only what is committed to the repo, plus the skills enabled on my claude.ai account.** My machine's configuration (`~/.claude/`) doesn't reach the cloud, and plugins declared in the repo aren't installed in cloud sessions.
+The technical constraint that shapes everything: **a cloud session sees only what is committed to the repo, plus the skills enabled on my claude.ai account.** My machine's configuration (`~/.claude/`) doesn't reach the cloud on its own, and plugins declared in the repo aren't installed in cloud sessions. The one exception is the account's always-on rules: the cloud environment's setup script installs them as `~/.claude/CLAUDE.md` (ADR 0010).
 
 | Level | Where it lives | What it holds | Applies to |
 |---|---|---|---|
 | **Account** | Skills on my claude.ai account | The *method*: writing specs, implementing an issue, critiquing, explaining, resuming work | Every cloud session, on every repo |
+| **Account rules** | `account/CLAUDE.md`, installed as `~/.claude/CLAUDE.md` by the setup script and on my machine | Rules that hold everywhere, always on (a skill only loads when it matches) | Every session, cloud or local, on every repo |
 | **Kit** | This repo, copied into projects | Roles (subagents), hooks, permissions, rules, issue templates, baseline CI, a `CLAUDE.md` skeleton | Every project that adopts it |
 | **Project** | The project's repo | Project-specific `CLAUDE.md`, architectural decisions, `progress.md`, `docs/learn/` | That project only |
 
@@ -72,6 +73,8 @@ agent-kit/
 │       ├── decisions/        # where the project records its ADRs
 │       ├── learn/            # learning notes
 │       └── progress.md       # state of the work in progress
+├── account/
+│   └── CLAUDE.md             # always-on rules, installed as ~/.claude/CLAUDE.md
 ├── account-skills/           # sources of the skills to enable on the account
 ├── evals/                    # tests for the harness itself
 └── scripts/
