@@ -12,6 +12,8 @@
 | **Effort** | Low **+5** · Medium **0** · High **−5** |
 | **Parked** | Elia said "when it's needed": capped at **30** |
 
+| **Started now** | Elia picks it to start now: it takes the highest open value. The sum stays written next to it; if the sum is low, say so |
+
 Then: clamp to 1–100, and move to the nearest free number so no two open issues tie.
 
 ## Where it's written
