@@ -1,0 +1,28 @@
+# 0009 · Issue data lives in issue fields; the project keeps only Status
+
+**Status:** proposed · 2026-10-31
+
+## Context
+Today the project template holds its own number fields: *Cost $*, *Opus share %*, *Waited on me (h)*. *Effort* and *Priority* are already org issue fields ([ADR 0008](0008-numeric-priority-and-projects-from-the-template.md)).
+
+Project fields live in one project. Agents can't read them (they see issues, not Projects), and a second project would need its own copy.
+
+Issue fields live on the issue. Agents, Actions and every project see the same value.
+
+*Status* is built into every project. It can't be removed, and it can't be an issue field.
+
+## Decision
+- **Every piece of issue data is an org issue field.** Priority, Effort, Cost $, Opus share %, Waited on me (h), and a new **Stage**.
+- **The project's only own field is Status.**
+- **Stage mirrors Status**: the same values, in the same order, with the same colours.
+- **A reconciler runs every 10 minutes.** When Stage and Status differ, it aligns them. Which side wins is an open question (see Consequences).
+- **Nothing is left without data.** A nightly check lists open issues with a missing field and puts them in front of Elia.
+
+## Consequences
+- Supersedes the part of [ADR 0007](0007-project-boards.md) that put number fields in the project.
+- `project-template.json` moves the number fields to `issueFields` and adds Stage.
+- Depends on the cloud test of issue fields (board design, T1). If cloud sessions can't use them, this ADR is revisited.
+- GitHub Actions schedules can run late under load. "Every 10 minutes" means "within about 10 to 20 minutes".
+- Open, to decide in small separate issues:
+  - when Stage and Status differ, which one wins;
+  - whether agent labels still drive Stage, or Stage replaces them.
