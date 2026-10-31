@@ -21,4 +21,8 @@ When something fails, the agent behaves like an employee who owns the task.
 ## Consequences
 - Fewer interactions with Elia. Those left are decisions, not debugging.
 - Agents spend more time on failures. They stop when the alternatives run out, or when the next step needs a permission they don't have. They never widen their own permissions to get around a block.
-- Applies to every agent in every repo. jamly's contract gets the same rule ([Agents recover before they escalate: add the rule to CLAUDE.md](https://github.com/ferrarolabs/jamly/issues/13)); `template/` gets it in phase 4.
+- Applies to every agent, in every repo and every session. It lives in three places:
+  - **Account:** `account/CLAUDE.md` in this repo, installed as `~/.claude/CLAUDE.md`. Cloud sessions get it from the environment's setup script; Elia's machine gets it the same way. One source, so it never drifts.
+  - **Repos:** a short line in this repo's `CLAUDE.md` and in jamly's ([Agents recover before they escalate: add the rule to CLAUDE.md](https://github.com/ferrarolabs/jamly/issues/13)), so it holds even where the account file is missing.
+  - **New projects:** through `template/` in phase 4.
+- `account/` is new: always-on rules for Elia's account, not for a project. A claude.ai skill can't carry them, because a skill loads only when its description matches the task. It sits outside `template/`, so ADR 0001 doesn't apply to it.
