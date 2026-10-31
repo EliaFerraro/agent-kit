@@ -15,7 +15,7 @@ Issue fields live on the issue. Agents, Actions and every project see the same v
 - **Every piece of issue data is an org issue field.** Priority, Effort, Cost $, Opus share %, Waited on me (h), and a new **Stage**.
 - **The project's only own field is Status.**
 - **Stage mirrors Status**: the same values, in the same order, with the same colours.
-- **A reconciler runs every 10 minutes.** When Stage and Status differ, it aligns them. Which side wins is an open question (see Consequences).
+- **A reconciler runs every 10 minutes.** When Stage and Status differ, the value changed most recently wins. On a tie, Stage wins, because agents can see it ([decided](https://github.com/ferrarolabs/agent-kit/issues/71)).
 - **Nothing is left without data.** A [nightly check](https://github.com/ferrarolabs/agent-kit/issues/75) lists open issues with a missing field and puts them in front of Elia.
 
 ## Consequences
@@ -23,6 +23,5 @@ Issue fields live on the issue. Agents, Actions and every project see the same v
 - `project-template.json` moves the number fields to `issueFields` and adds Stage.
 - Depends on [the cloud test of issue fields](https://github.com/ferrarolabs/agent-kit/issues/24). If cloud sessions can't use them, this ADR is revisited.
 - GitHub Actions schedules can run late under load. "Every 10 minutes" means "within about 10 to 20 minutes".
-- Open, to decide in small separate issues:
-  - [when Stage and Status differ, which one wins](https://github.com/ferrarolabs/agent-kit/issues/71);
-  - [whether agent labels still drive Stage](https://github.com/ferrarolabs/agent-kit/issues/72), or Stage replaces them.
+- The reconciler needs the update time of both values. If one side doesn't expose it, the rule is revisited.
+- Still open: [whether agent labels still drive Stage](https://github.com/ferrarolabs/agent-kit/issues/72), or Stage replaces them.
