@@ -16,13 +16,13 @@ Issue fields live on the issue. Agents, Actions and every project see the same v
 - **The project's only own field is Status.**
 - **Stage mirrors Status**: the same values, in the same order, with the same colours.
 - **A reconciler runs every 10 minutes.** When Stage and Status differ, it aligns them. Which side wins is an open question (see Consequences).
-- **Nothing is left without data.** A nightly check lists open issues with a missing field and puts them in front of Elia.
+- **Nothing is left without data.** A [nightly check](https://github.com/ferrarolabs/agent-kit/issues/75) lists open issues with a missing field and puts them in front of Elia.
 
 ## Consequences
 - Supersedes the part of [ADR 0007](0007-project-boards.md) that put number fields in the project.
 - `project-template.json` moves the number fields to `issueFields` and adds Stage.
-- Depends on the cloud test of issue fields (board design, T1). If cloud sessions can't use them, this ADR is revisited.
+- Depends on [the cloud test of issue fields](https://github.com/ferrarolabs/agent-kit/issues/24). If cloud sessions can't use them, this ADR is revisited.
 - GitHub Actions schedules can run late under load. "Every 10 minutes" means "within about 10 to 20 minutes".
 - Open, to decide in small separate issues:
-  - when Stage and Status differ, which one wins;
-  - whether agent labels still drive Stage, or Stage replaces them.
+  - [when Stage and Status differ, which one wins](https://github.com/ferrarolabs/agent-kit/issues/71);
+  - [whether agent labels still drive Stage](https://github.com/ferrarolabs/agent-kit/issues/72), or Stage replaces them.
