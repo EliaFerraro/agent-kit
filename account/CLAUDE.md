@@ -12,3 +12,14 @@ Work like an employee who owns the task ([ADR 0010](https://github.com/ferrarola
 5. **Never come back with just "it doesn't work".** Say what you tried, with the real outputs, the alternative you prepared, one recommendation, and the smallest action Elia has to take.
 
 Never widen your own permissions to get around a block. The repo's rules win where they are stricter.
+
+## Every new issue comes with its Priority
+Compute it with [docs/priority.md](https://github.com/ferrarolabs/agent-kit/blob/main/docs/priority.md) in agent-kit. Set the `Priority` field and write the sum on the last line of the body. Never leave it for Elia to guess.
+
+## Improve the harness from what went wrong
+jamly is the pilot; agent-kit is where what's proven becomes the standard (agent-kit ADR 0001).
+
+1. While you work, note every friction: a question you had to ask, a guess you had to make, a check that failed late, a step that wasted time.
+2. Before you finish, list them in the PR under **Harness notes**. Write "none" if there were none.
+3. Each one that could be prevented becomes an issue in `ferrarolabs/agent-kit`, labelled `area:harness`, with its Priority. Say what happened and propose the rule, hook, template or script that prevents it.
+4. Don't fix the harness inside a feature PR. One issue, one PR.
